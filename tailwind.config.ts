@@ -19,49 +19,62 @@ export default {
     },
     extend: {
       colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(246, 82%, 60%)",
-          foreground: "hsl(0, 0%, 100%)",
-          muted: "hsl(246, 70%, 70%)",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          pink: "hsl(350, 100%, 95%)",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+          green: "hsl(142, 76%, 95%)",
+          lightBlue: "hsl(210, 100%, 95%)",
+          purple: "hsl(270, 100%, 95%)",
           yellow: "hsl(40, 100%, 95%)",
-          green: "hsl(142, 100%, 95%)",
-          purple: "hsl(270, 100%, 97%)",
         },
         success: {
           DEFAULT: "hsl(142, 76%, 36%)",
-          foreground: "hsl(142, 100%, 95%)",
+          light: "hsl(142, 76%, 95%)",
         },
-        warning: {
-          DEFAULT: "hsl(38, 92%, 50%)",
-          foreground: "hsl(48, 100%, 95%)",
+        error: {
+          DEFAULT: "hsl(0, 84%, 60%)",
+          light: "hsl(0, 84%, 95%)",
         },
-        border: "hsl(220, 13%, 91%)",
-        input: "hsl(220, 13%, 91%)",
-        ring: "hsl(246, 82%, 60%)",
-        background: "hsl(0, 0%, 100%)",
-        foreground: "hsl(222, 47%, 11%)",
-        secondary: {
-          DEFAULT: "hsl(220, 13%, 91%)",
-          foreground: "hsl(222, 47%, 11%)",
+        neutral: {
+          10: "hsl(0, 0%, 100%)",
         },
-        destructive: {
-          DEFAULT: "hsl(0, 86%, 97%)",
-          foreground: "hsl(0, 74%, 42%)",
+        grey: {
+          300: "hsl(220, 9%, 46%)",
+          700: "hsl(220, 9%, 20%)",
         },
-        muted: {
-          DEFAULT: "hsl(220, 13%, 91%)",
-          foreground: "hsl(220, 9%, 46%)",
-        },
-        accent: {
-          DEFAULT: "hsl(220, 13%, 91%)",
-          foreground: "hsl(222, 47%, 11%)",
-        },
-        popover: {
-          DEFAULT: "hsl(0, 0%, 100%)",
-          foreground: "hsl(222, 47%, 11%)",
+        supporting: {
+          violet: "hsl(270, 100%, 97%)",
+          yellow: "hsl(40, 100%, 95%)",
+          green: "hsl(142, 100%, 95%)",
         },
       },
       borderRadius: {
