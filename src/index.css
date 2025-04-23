@@ -62,14 +62,39 @@
   }
 
   .status-badge-success {
-    @apply bg-success-light text-success;
+    @apply bg-gradient-to-r from-success-light to-supporting-green text-success;
   }
 
   .status-badge-error {
-    @apply bg-error-light text-error;
+    @apply bg-gradient-to-r from-error-light to-error/10 text-error;
   }
 
   .status-badge-warning {
-    @apply bg-supporting-yellow text-yellow-600;
+    @apply bg-gradient-to-r from-supporting-yellow to-yellow-400/50 text-yellow-600;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-purple-soft {
+    @apply bg-gradient-to-r from-[#E5DEFF] to-[#F1F0FB];
+  }
+
+  .gradient-blue-soft {
+    @apply bg-gradient-to-r from-[#D3E4FD] to-[#F1F0FB];
+  }
+
+  .gradient-green-soft {
+    @apply bg-gradient-to-r from-[#F2FCE2] to-[#FDFCFB];
+  }
+
+  .gradient-yellow-soft {
+    @apply bg-gradient-to-r from-[#FEF7CD] to-[#FDFCFB];
+  }
+
+  .gradient-orange-soft {
+    @apply bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3];
+  }
+
+  .gradient-pink-soft {
+    @apply bg-gradient-to-r from-[#FFDEE2] to-[#FDE1D3];
   }
 }

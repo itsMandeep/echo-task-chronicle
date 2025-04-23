@@ -103,7 +103,11 @@ export default function TaskItem({ task }: TaskItemProps) {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`p-3 rounded-lg border mb-2 ${task.isCompleted ? 'bg-gray-50 opacity-80' : 'bg-white'}`}
+      className={`p-3 rounded-lg border mb-2 ${
+        task.isCompleted 
+          ? 'gradient-blue-soft opacity-80' 
+          : 'gradient-purple-soft'
+      }`}
     >
       <div className="flex items-start gap-2">
         <div 

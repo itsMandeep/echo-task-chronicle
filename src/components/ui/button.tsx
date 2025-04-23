@@ -1,7 +1,6 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
@@ -9,15 +8,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        default: "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90",
+        destructive: "bg-gradient-to-r from-destructive to-destructive/80 text-destructive-foreground hover:opacity-90",
+        outline: "border border-input bg-gradient-to-r from-background to-accent/5 hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground hover:opacity-90",
+        ghost: "hover:bg-gradient-to-r from-accent to-accent/50 hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        success: "bg-gradient-to-r from-success-light to-supporting-green text-success hover:opacity-90",
+        warning: "bg-gradient-to-r from-supporting-yellow to-yellow-400/80 text-yellow-600 hover:opacity-90",
+        info: "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-600 hover:opacity-90",
       },
       size: {
         default: "h-10 px-4 py-2",
