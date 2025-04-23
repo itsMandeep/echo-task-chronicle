@@ -63,29 +63,86 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addTask = (task: Omit<Task, "id" | "createdAt">) => {
-    if (!isEditMode) return;
+    const now = new Date();
+    const currentDate = new Date(dateKey);
+    
+    // Set default times if not provided
+    const startTime = task.startTime || format(now, 'HH:mm');
+    const endTime = task.endTime || '23:59';
     
     const newTask: Task = {
       ...task,
       id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
+      createdAt: now.toISOString(),
+      startTime,
+      endTime,
+      repeatPattern: task.repeatPattern || 'none'
     };
 
-    setPlans(prev => ({
-      ...prev,
-      [dateKey]: {
+    setPlans(prev => {
+      const updatedPlans = { ...prev };
+      
+      // Add task to current date
+      updatedPlans[dateKey] = {
         ...prev[dateKey],
         tasks: [...(prev[dateKey]?.tasks || []), newTask],
         lastUpdated: new Date().toISOString()
+      };
+
+      // If task is repeating, add future instances
+      if (newTask.repeatPattern !== 'none') {
+        let nextDate = new Date(currentDate);
+        for (let i = 0; i < 12; i++) { // Create next 12 instances
+          switch (newTask.repeatPattern) {
+            case 'weekly':
+              nextDate.setDate(nextDate.getDate() + 7);
+              break;
+            case 'fortnightly':
+              nextDate.setDate(nextDate.getDate() + 14);
+              break;
+            case 'monthly':
+              nextDate.setMonth(nextDate.getMonth() + 1);
+              break;
+          }
+
+          const nextDateKey = format(nextDate, 'yyyy-MM-dd');
+          
+          // Create future task instance
+          const futureTask: Task = {
+            ...newTask,
+            id: crypto.randomUUID(),
+            createdAt: newTask.createdAt // Keep original creation date
+          };
+
+          updatedPlans[nextDateKey] = {
+            ...prev[nextDateKey],
+            date: nextDateKey,
+            tasks: [...(prev[nextDateKey]?.tasks || []), futureTask],
+            notes: [...(prev[nextDateKey]?.notes || [])],
+            lastUpdated: new Date().toISOString()
+          };
+        }
       }
-    }));
+
+      return updatedPlans;
+    });
   };
 
   const updateTask = (taskId: string, updates: Partial<Task>) => {
     setPlans(prev => {
       const currentTasks = prev[dateKey]?.tasks || [];
+      const taskToUpdate = currentTasks.find(task => task.id === taskId);
+      
+      if (!taskToUpdate) return prev;
+
       const updatedTasks = currentTasks.map(task => 
-        task.id === taskId ? { ...task, ...updates } : task
+        task.id === taskId 
+          ? {
+              ...task,
+              ...updates,
+              endTime: updates.endTime || task.endTime || '23:59'
+            }
+          : task
       );
 
       return {

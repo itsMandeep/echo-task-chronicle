@@ -30,13 +30,14 @@ interface TaskItemProps {
 }
 
 export default function TaskItem({ task }: TaskItemProps) {
-  const { isEditMode, updateTask, deleteTask } = usePlanner();
+  const { updateTask, deleteTask } = usePlanner();
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<Partial<Task>>({
     title: task.title,
     startTime: task.startTime,
     endTime: task.endTime,
     priority: task.priority,
+    repeatPattern: task.repeatPattern || 'none',
   });
 
   const {
@@ -228,6 +229,26 @@ export default function TaskItem({ task }: TaskItemProps) {
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="repeatPattern">Repeat</Label>
+              <Select 
+                value={editedTask.repeatPattern || 'none'} 
+                onValueChange={(value) => setEditedTask({
+                  ...editedTask, 
+                  repeatPattern: value as 'none' | 'weekly' | 'fortnightly' | 'monthly'
+                })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select repeat pattern" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No repeat</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="fortnightly">Fortnightly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
                 </SelectContent>
               </Select>
             </div>

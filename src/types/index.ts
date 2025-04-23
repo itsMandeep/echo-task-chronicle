@@ -1,4 +1,3 @@
-
 export interface Task {
   id: string;
   title: string;
@@ -9,6 +8,7 @@ export interface Task {
   createdAt: string;
   progress: number; // 0-100
   spilledFrom?: string; // Date string if task was carried over
+  repeatPattern?: 'none' | 'weekly' | 'fortnightly' | 'monthly';
 }
 
 export interface Note {
@@ -24,4 +24,3 @@ export interface DailyPlan {
   notes: Note[];
   lastUpdated: string;
 }
-
