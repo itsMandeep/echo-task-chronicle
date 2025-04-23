@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { usePlanner } from '@/context/PlannerContext';
 import TaskItem from './TaskItem';
@@ -19,11 +18,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ListTodo, Plus } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { ListTodo, Plus, ArrowUpDown, Clock } from 'lucide-react';
+
+type SortType = 'priority' | 'startTime' | 'endTime' | 'none';
 
 export default function TaskList() {
-  const { currentPlan, isEditMode, addTask } = usePlanner();
+  const { currentPlan, isEditMode, addTask, reorderTasks } = usePlanner();
   const [isAddingTask, setIsAddingTask] = useState(false);
+  const [sortType, setSortType] = useState<SortType>('none');
   const [newTask, setNewTask] = useState({
     title: '',
     startTime: '',
@@ -32,6 +49,59 @@ export default function TaskList() {
     isCompleted: false,
     progress: 0
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = currentPlan!.tasks.findIndex((task) => task.id === active.id);
+      const newIndex = currentPlan!.tasks.findIndex((task) => task.id === over.id);
+      
+      const newTasks = arrayMove(currentPlan!.tasks, oldIndex, newIndex);
+      reorderTasks(newTasks);
+    }
+  };
+
+  const sortTasks = (tasks: typeof currentPlan.tasks) => {
+    if (!tasks) return [];
+    
+    let sortedTasks = [...tasks];
+    
+    switch (sortType) {
+      case 'priority': {
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        sortedTasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        break;
+      }
+      case 'startTime':
+        sortedTasks.sort((a, b) => {
+          if (!a.startTime) return 1;
+          if (!b.startTime) return -1;
+          return a.startTime.localeCompare(b.startTime);
+        });
+        break;
+      case 'endTime':
+        sortedTasks.sort((a, b) => {
+          if (!a.endTime) return 1;
+          if (!b.endTime) return -1;
+          return a.endTime.localeCompare(b.endTime);
+        });
+        break;
+      default:
+        // Keep original order
+        break;
+    }
+
+    // Always show incomplete tasks first within the sort
+    return sortedTasks.sort((a, b) => (a.isCompleted === b.isCompleted ? 0 : a.isCompleted ? 1 : -1));
+  };
 
   const handleAddTask = () => {
     if (newTask.title.trim()) {
@@ -60,6 +130,37 @@ export default function TaskList() {
           <h2 className="text-lg font-medium">Tasks</h2>
         </div>
         <div className="flex items-center gap-2">
+          <Select value={sortType} onValueChange={(value) => setSortType(value as SortType)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">
+                <div className="flex items-center">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  Original order
+                </div>
+              </SelectItem>
+              <SelectItem value="priority">
+                <div className="flex items-center">
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  By priority
+                </div>
+              </SelectItem>
+              <SelectItem value="startTime">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-2" />
+                  By start time
+                </div>
+              </SelectItem>
+              <SelectItem value="endTime">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-2" />
+                  By end time
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <span className="text-sm text-gray-500">
             {getIncompleteTaskCount()}/{currentPlan?.tasks.length || 0} remaining
           </span>
@@ -78,26 +179,20 @@ export default function TaskList() {
             No tasks yet. {isEditMode ? "Click 'Add Task' to create one." : ""}
           </div>
         ) : (
-          <>
-            {/* Show incomplete tasks first */}
-            {currentPlan?.tasks
-              .filter(task => !task.isCompleted)
-              .sort((a, b) => {
-                // Sort by priority (high -> medium -> low)
-                const priorityOrder = { high: 0, medium: 1, low: 2 };
-                return priorityOrder[a.priority] - priorityOrder[b.priority];
-              })
-              .map(task => (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={currentPlan?.tasks || []}
+              strategy={verticalListSortingStrategy}
+            >
+              {sortTasks(currentPlan?.tasks).map((task) => (
                 <TaskItem key={task.id} task={task} />
               ))}
-            
-            {/* Then show completed tasks */}
-            {currentPlan?.tasks
-              .filter(task => task.isCompleted)
-              .map(task => (
-                <TaskItem key={task.id} task={task} />
-              ))}
-          </>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 

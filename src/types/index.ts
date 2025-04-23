@@ -24,3 +24,4 @@ export interface DailyPlan {
   notes: Note[];
   lastUpdated: string;
 }
+

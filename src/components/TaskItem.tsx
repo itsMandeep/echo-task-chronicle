@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { Task } from '@/types';
 import { usePlanner } from '@/context/PlannerContext';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Trash, Clock, AlertTriangle, PenLine, CheckCircle } from 'lucide-react';
+import { Trash, Clock, AlertTriangle, PenLine, CheckCircle, GripVertical } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { 
   Dialog,
@@ -23,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface TaskItemProps {
   task: Task;
@@ -37,6 +38,19 @@ export default function TaskItem({ task }: TaskItemProps) {
     endTime: task.endTime,
     priority: task.priority,
   });
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   const handleProgressChange = (value: number) => {
     updateTask(task.id, { 
@@ -84,8 +98,19 @@ export default function TaskItem({ task }: TaskItemProps) {
   };
 
   return (
-    <div className={`p-3 rounded-lg border mb-2 ${task.isCompleted ? 'bg-gray-50 opacity-80' : 'bg-white'}`}>
+    <div 
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`p-3 rounded-lg border mb-2 ${task.isCompleted ? 'bg-gray-50 opacity-80' : 'bg-white'}`}
+    >
       <div className="flex items-start gap-2">
+        <div 
+          className="cursor-move mt-1 text-gray-400 hover:text-gray-600 transition-colors"
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </div>
         <div className="pt-0.5">
           <Checkbox 
             checked={task.isCompleted} 

@@ -1,7 +1,6 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { DailyPlan, Task, Note } from "@/types";
-import { format, isToday, isBefore, parseISO } from "date-fns";
+import { format } from "date-fns";
 
 interface PlannerContextType {
   currentDate: Date;
@@ -18,6 +17,7 @@ interface PlannerContextType {
   setPlanName: (name: string) => void;
   checkForPreviousTasks: () => { hasPrevious: boolean; previousDate: string | null };
   importPreviousTasks: () => void;
+  reorderTasks: (tasks: Task[]) => void;
 }
 
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
@@ -29,10 +29,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
 
   const dateKey = format(currentDate, "yyyy-MM-dd");
   
-  // Initialize or get current plan
   const currentPlan = plans[dateKey] || null;
 
-  // Load plans from localStorage on component mount
   useEffect(() => {
     const savedPlans = localStorage.getItem("dailyPlans");
     if (savedPlans) {
@@ -40,14 +38,12 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Save plans to localStorage whenever they change
   useEffect(() => {
     if (Object.keys(plans).length > 0) {
       localStorage.setItem("dailyPlans", JSON.stringify(plans));
     }
   }, [plans]);
 
-  // Initialize plan for current day if it doesn't exist
   useEffect(() => {
     if (!plans[dateKey]) {
       setPlans(prev => ({
@@ -191,7 +187,6 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
-  // Check if there are incomplete tasks from the previous day
   const checkForPreviousTasks = () => {
     const yesterday = new Date(currentDate);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -210,7 +205,6 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     return { hasPrevious: false, previousDate: null };
   };
 
-  // Import incomplete tasks from the previous day
   const importPreviousTasks = () => {
     if (!isEditMode) return;
     
@@ -242,6 +236,17 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const reorderTasks = (tasks: Task[]) => {
+    setPlans(prev => ({
+      ...prev,
+      [dateKey]: {
+        ...prev[dateKey],
+        tasks,
+        lastUpdated: new Date().toISOString()
+      }
+    }));
+  };
+
   return (
     <PlannerContext.Provider
       value={{
@@ -258,7 +263,8 @@ export function PlannerProvider({ children }: { children: React.ReactNode }) {
         deleteNote,
         setPlanName,
         checkForPreviousTasks,
-        importPreviousTasks
+        importPreviousTasks,
+        reorderTasks
       }}
     >
       {children}
